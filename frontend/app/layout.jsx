@@ -2,11 +2,10 @@ import { Analytics } from '@vercel/analytics/next'
 import { Fraunces } from 'next/font/google'
 
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces' })
-import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'Atrium — One portal for every client',
   description: 'A calm, connected client portal for agencies and freelancers.',
   generator: 'v0.app',
@@ -29,7 +28,7 @@ export const metadata: Metadata = {
   },
 }
 
-export const viewport: Viewport = {
+export const viewport = {
   colorScheme: 'light dark',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: 'white' },
@@ -39,9 +38,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className={`${fraunces.variable} antialiased`}>
