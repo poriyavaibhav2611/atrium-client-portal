@@ -6,9 +6,25 @@ import { useTheme } from '@/components/theme-provider'
 
 const cx = (...values) => values.filter(Boolean).join(' ')
 
-export function Card({ className = '', children, ...props }) { return <section className={cx('group rounded-2xl border border-slate-200/70 bg-white p-6 shadow-xl shadow-slate-200/30 transition-all duration-300 hover:border-indigo-100 hover:shadow-2xl hover:shadow-indigo-100/50 dark:border-white/[0.06] dark:bg-white/[0.02] dark:shadow-none dark:hover:border-white/[0.1] dark:hover:bg-white/[0.04]', className)} {...props}>{children}</section> }
+export function Card({ className = '', interactive, children, ...props }) { 
+  const isInteractive = interactive || props.onClick || props.href;
+  return (
+    <section 
+      className={cx(
+        'group rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm transition-all duration-200',
+        'dark:border-white/[0.06] dark:bg-white/[0.02] dark:shadow-none',
+        'hover:border-slate-300 dark:hover:border-indigo-500/30',
+        isInteractive && 'cursor-pointer hover:shadow-md hover:-translate-y-0.5 dark:hover:shadow-[0_0_0_1px_rgba(99,102,241,0.15)]',
+        className
+      )} 
+      {...props}
+    >
+      {children}
+    </section>
+  )
+}
 export function PageHeader({ title, subtitle, actions }) { return <div className="mb-6 flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{title}</h1><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p></div>{actions && <div className="flex items-center gap-2">{actions}</div>}</div> }
-export function Button({ variant = 'secondary', icon = false, className = '', children, ...props }) { const styles = variant === 'primary' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 hover:bg-indigo-500 hover:shadow-indigo-600/40' : variant === 'ghost' ? 'border-transparent bg-transparent text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/[0.05]' : 'border-slate-200/80 bg-white text-slate-800 shadow-sm hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-100 dark:hover:bg-white/[0.08] dark:shadow-none'; return <button className={cx('inline-flex items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/30', icon ? 'h-10 w-10' : 'h-10 px-4', styles, className)} {...props}>{children}</button> }
+export function Button({ variant = 'secondary', primary, icon = false, className = '', children, ...props }) { const isPrimary = primary || variant === 'primary'; const styles = isPrimary ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 hover:bg-indigo-500 hover:shadow-indigo-600/40' : variant === 'ghost' ? 'border-transparent bg-transparent text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/[0.05]' : 'border-slate-200/80 bg-white text-slate-800 shadow-sm hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-100 dark:hover:bg-white/[0.08] dark:shadow-none'; return <button className={cx('inline-flex items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/30', icon ? 'h-10 w-10' : 'h-10 px-4', styles, className)} {...props}>{children}</button> }
 export function Input({ className = '', ...props }) { return <input className={cx('h-10 rounded-xl border border-slate-200/80 bg-white px-4 text-sm placeholder:text-slate-400 transition-colors focus-visible:border-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/30 dark:border-white/10 dark:bg-white/[0.02] dark:placeholder:text-slate-500', className)} {...props} /> }
 const chipStyles = { green: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400', amber: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400', red: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400', indigo: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300' }
 export function Chip({ tone = 'indigo', children }) { return <span className={cx('inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-medium', chipStyles[tone] || chipStyles.indigo)}>{children}</span> }
@@ -18,7 +34,7 @@ export function AvatarStack({ names = [] }) { return <div className="flex -space
 export function StatCard({ label, value, trend }) { return <Card className="p-5"><p className="text-sm text-slate-500 dark:text-slate-400">{label}</p><p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{value}</p>{trend && <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">{trend}</p>}</Card> }
 export function Table({ children, className = '' }) { return <div className={cx('overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/20 dark:border-white/[0.08] dark:bg-[#111113]/50', className)}><div className="overflow-x-auto"><table className="w-full text-left text-sm">{children}</table></div></div> }
 export const TableHeader = ({ children }) => <thead className="bg-slate-50/60 dark:bg-white/[0.02]">{children}</thead>
-export const TableHead = ({ children, className = '' }) => <th className={cx('h-10 px-4 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400', className)}>{children}</th>
+export const TableHead = ({ children, className = '' }) => <th className={cx('h-10 px-4 first:pl-6 last:pr-6 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400', className)}>{children}</th>
 export const TableRow = ({ children, className = '', ...props }) => <tr className={cx('h-[52px] border-b border-slate-100 hover:bg-slate-50 dark:border-white/[0.06] dark:hover:bg-white/[0.03]', className)} {...props}>{children}</tr>
-export const TableCell = ({ children, className = '' }) => <td className={cx('px-4 text-slate-900 dark:text-slate-100', className)}>{children}</td>
+export const TableCell = ({ children, className = '' }) => <td className={cx('px-4 first:pl-6 last:pr-6 text-slate-900 dark:text-slate-100', className)}>{children}</td>
 export function ThemeToggle() { const { theme, setTheme, resolvedTheme } = useTheme(); const [mounted, setMounted] = useState(false); useEffect(() => setMounted(true), []); const dark = mounted && (theme === 'dark' || resolvedTheme === 'dark'); return <Button icon aria-label="Toggle theme" onClick={() => setTheme(dark ? 'light' : 'dark')}>{mounted ? (dark ? <Sun data-icon="inline-start" /> : <Moon data-icon="inline-start" />) : <span aria-hidden="true" className="size-5" />}</Button> }

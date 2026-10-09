@@ -9,6 +9,12 @@ export const requestPasswordReset = (email) => wait({ ok: true, email })
 export const getOverview = () => wait(mock.overview)
 export const getProjects = () => wait(mock.projects)
 export const getClients = () => wait(mock.clients)
+export const getClient = (id) => wait(mock.clients.find(c => c.id === id))
+export const updateClient = (id, data) => { const idx = mock.clients.findIndex(c => c.id === id); if(idx !== -1) mock.clients[idx] = { ...mock.clients[idx], ...data }; return wait(mock.clients[idx]); }
+export const archiveClient = (id) => { mock.clients = mock.clients.filter(c => c.id !== id); return wait({ ok: true }); }
+export const resendInvite = (id) => wait({ ok: true });
+export const togglePortalAccess = (id, hasAccess) => { const idx = mock.clients.findIndex(c => c.id === id); if(idx !== -1) { mock.clients[idx].portalAccess = hasAccess; mock.clients[idx].status = hasAccess ? 'Active' : 'Paused'; } return wait(mock.clients[idx]); }
+export const saveClientNote = (id, note) => { const idx = mock.clients.findIndex(c => c.id === id); if(idx !== -1) mock.clients[idx].note = note; return wait(mock.clients[idx]); }
 export const getFiles = () => wait(mock.files)
 export const getThreads = () => wait(mock.messages)
 export const getApprovals = () => wait(mock.approvals)
