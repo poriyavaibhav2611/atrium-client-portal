@@ -1,0 +1,3 @@
+import { NextResponse } from 'next/server'
+export function middleware(request) { const { pathname, search } = request.nextUrl; const hasSession = request.cookies.has('atrium_session'); if (pathname.startsWith('/dashboard') && !hasSession) { const url = request.nextUrl.clone(); url.pathname = '/login'; url.searchParams.set('next', pathname + search); return NextResponse.redirect(url) } if ((pathname === '/login' || pathname === '/signup') && hasSession) { return NextResponse.redirect(new URL('/dashboard', request.url)) } return NextResponse.next() }
+export const config = { matcher: ['/dashboard/:path*', '/login', '/signup'] }
