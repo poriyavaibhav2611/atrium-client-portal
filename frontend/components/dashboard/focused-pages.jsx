@@ -1,7 +1,9 @@
 'use client'
-import { useMemo, useRef, useState } from 'react'
-import { Check, Clock, Copy, Download, FileText, MessageSquare, Paperclip, Receipt, Search, Send, Upload, X } from 'lucide-react'
+import { useMemo, useRef, useState, useEffect } from 'react'
+import { Check, Clock, Copy, Download, FileText, MessageSquare, Paperclip, Receipt, Search, Send, Upload, X, CheckCircle2, Loader2, Activity as ActivityIcon } from 'lucide-react'
 import { Avatar, Button, Card, Chip, Input, PageHeader, Table, TableCell, TableHead, TableHeader, TableRow } from '@/components/dashboard/ui'
+import { motion } from 'framer-motion'
+import { activity } from '@/data/mock'
 import { Dropdown } from '@/components/ui/dropdown'
 import { DatePicker } from '@/components/ui/datepicker'
 
@@ -73,5 +75,165 @@ export function FocusedInvoicesPage() {
   </div> 
 }
 
-const events = [{ group: 'Today', type: 'Approvals', actor: 'Maya Chen', text: 'approved Homepage v3', context: 'Fold Studio', time: '12m ago', icon: Check }, { group: 'Today', type: 'Files', actor: 'Jordan Kim', text: 'uploaded brand assets', context: 'Helios', time: '1h ago', icon: Upload }, { group: 'Today', type: 'Invoices', actor: 'Studio A', text: 'paid Invoice #1041', context: '$3,800', time: '3h ago', icon: Receipt }, { group: 'Today', type: 'Comments', actor: 'Maya Chen', text: 'New comment', context: 'Homepage v3 · Today, 10:42', time: '', icon: MessageSquare }, { group: 'Yesterday', type: 'Files', actor: 'Jordan Kim', text: 'File uploaded', context: 'Homepage-v3.fig', time: 'Yesterday', icon: Upload }, { group: 'Earlier', type: 'Invoices', actor: 'Studio A', text: 'Invoice paid', context: '#1042 · $2,400', time: 'Oct 18', icon: Receipt }, { group: 'Earlier', type: 'Approvals', actor: 'Maya Chen', text: 'Project approved', context: 'Homepage v3', time: 'Oct 16', icon: Check }]
-export function FocusedActivityPage() { const [filter, setFilter] = useState('All'); const filtered = filter === 'All' ? events : events.filter((x) => x.type === filter); return <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-6 pb-10 pt-6 lg:px-8"><PageHeader title="Activity" subtitle="A clear timeline of client work and decisions." /><div className="flex flex-wrap gap-2">{['All','Comments','Files','Invoices','Approvals'].map((x) => <button key={x} onClick={() => setFilter(x)} className={`rounded-full border px-3 py-1.5 text-sm transition ${filter === x ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300' : 'border-slate-200 text-slate-500 dark:border-white/[0.08] dark:text-slate-400'}`}>{x}</button>)}</div><Card className="p-6"><div className="relative"><div className="absolute bottom-2 left-4 top-2 w-0.5 bg-indigo-500/20" />{['Today','Yesterday','Earlier'].map((group) => { const rows = filtered.filter((x) => x.group === group); return rows.length ? <section key={group} className="relative mb-8 last:mb-0"><h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">{group}</h3><div className="grid gap-5">{rows.map((event) => <div className="relative flex gap-3" key={`${event.actor}-${event.text}-${event.time}`}><Avatar name={event.actor} size={28} /><span className="relative z-10 -ml-2 mt-0.5 flex size-7 items-center justify-center rounded-full border-4 border-white bg-indigo-50 text-indigo-600 dark:border-[#111113] dark:bg-indigo-500/15"><event.icon className="size-3.5" /></span><div className="min-w-0 flex-1"><p className="text-sm"><strong>{event.actor}</strong> {event.text}</p><p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{event.context}{event.time ? ` · ${event.time}` : ''}</p></div></div>)}</div></section> : null })}</div></Card></div> }
+export function FocusedActivityPage() {
+  const [filter, setFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
+  const [loadingEarlier, setLoadingEarlier] = useState(false);
+  const [caughtUp, setCaughtUp] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleLoadEarlier = () => {
+    setLoadingEarlier(true);
+    setTimeout(() => {
+      setLoadingEarlier(false);
+      setCaughtUp(true);
+    }, 600);
+  };
+
+  const filtered = filter === 'All' ? activity : activity.filter((x) => x.type === filter);
+
+  const typeIcons = {
+    Comments: MessageSquare,
+    Files: Upload,
+    Invoices: Receipt,
+    Approvals: CheckCircle2
+  };
+
+  const dayGroups = ['Today', 'Yesterday', 'Earlier'];
+  const hasVisibleEvents = dayGroups.some(group => filtered.some(x => x.day === group));
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  };
+
+  return (
+    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-6 pb-10 pt-6 lg:px-8">
+      <PageHeader title="Activity" subtitle="A clear timeline of client work and decisions." />
+      
+      <div className="flex flex-wrap gap-2">
+        {['All', 'Comments', 'Files', 'Invoices', 'Approvals'].map((x) => (
+          <button 
+            key={x} 
+            onClick={() => setFilter(x)} 
+            className={`rounded-full border px-3 py-1.5 text-sm transition ${filter === x ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300' : 'border-slate-200 text-slate-500 dark:border-white/[0.08] dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.02]'}`}
+          >
+            {x}
+          </button>
+        ))}
+      </div>
+
+      <Card className="p-0 border-slate-200 dark:border-white/[0.08]">
+        {loading ? (
+          <div className="p-6 flex flex-col gap-6">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="flex gap-4 animate-pulse">
+                <div className="size-9 rounded-full bg-slate-100 dark:bg-white/5 shrink-0" />
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-4 bg-slate-100 dark:bg-white/5 rounded w-3/4" />
+                  <div className="h-3 bg-slate-100 dark:bg-white/5 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : !hasVisibleEvents ? (
+          <div className="flex flex-col items-center justify-center p-12 text-center">
+            <span className="flex size-12 items-center justify-center rounded-full bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-slate-500 mb-4">
+              <ActivityIcon className="size-6" />
+            </span>
+            <p className="text-sm font-medium text-slate-900 dark:text-white">No activity yet</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">There are no {filter.toLowerCase()} events to show.</p>
+          </div>
+        ) : (
+          <div className="p-4 sm:p-6 pb-6">
+            <motion.div variants={containerVariants} initial="hidden" animate="show" className="flex flex-col">
+              {dayGroups.map((group, groupIdx) => {
+                const rows = filtered.filter(x => x.day === group);
+                if (!rows.length) return null;
+                return (
+                  <div key={group} className="relative">
+                    <h3 className={`text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 pb-2 ${groupIdx > 0 ? 'pt-6' : ''}`}>
+                      {group}
+                    </h3>
+                    <div className="relative flex flex-col">
+                      {rows.map((event, i) => {
+                        const Icon = typeIcons[event.type];
+                        const isLastInGroup = i === rows.length - 1;
+                        return (
+                          <motion.div variants={itemVariants} key={`${event.actor}-${event.time}-${i}`} className="relative flex w-full items-start gap-3 rounded-lg px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors">
+                            {!isLastInGroup && (
+                              <div className="absolute left-[34px] top-[40px] bottom-[-12px] w-[2px] bg-slate-200 dark:bg-white/10" />
+                            )}
+                            
+                            <div className="relative shrink-0 z-10">
+                              <span className="flex size-9 items-center justify-center rounded-full bg-indigo-50 text-xs font-semibold text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300 ring-4 ring-white dark:ring-[#111113]">
+                                {event.initials}
+                              </span>
+                              <div className="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full bg-white dark:bg-[#111113] ring-2 ring-white dark:ring-[#111113]">
+                                <Icon className="size-3 text-indigo-600 dark:text-indigo-400" />
+                              </div>
+                            </div>
+
+                            <div className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4 mt-0.5">
+                              <div className="min-w-0">
+                                <p className="text-sm text-slate-900 dark:text-white">
+                                  <span className="font-semibold">{event.actor}</span>{' '}
+                                  <span className="font-normal">{event.action}</span>{' '}
+                                  <span className="font-medium">{event.object}</span>
+                                </p>
+                                
+                                {event.quote && (
+                                  <div className="mt-2 mb-1 border-l-2 border-indigo-200 dark:border-indigo-500/30 pl-3">
+                                    <p className="text-sm italic text-slate-600 dark:text-slate-300">"{event.quote}"</p>
+                                  </div>
+                                )}
+
+                                <div className="mt-1 flex flex-wrap gap-1.5">
+                                  {event.chips.map((chip, cIdx) => (
+                                    <span key={cIdx} className="inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:bg-white/10 dark:text-slate-400">
+                                      {chip}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap sm:text-right">
+                                {event.time}
+                              </span>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </motion.div>
+            
+            <div className="mt-6 flex justify-center border-t border-slate-100 pt-6 dark:border-white/5">
+              {caughtUp ? (
+                <p className="text-sm text-slate-400 dark:text-slate-500">You are all caught up</p>
+              ) : (
+                <Button onClick={handleLoadEarlier} disabled={loadingEarlier} className="text-xs h-8">
+                  {loadingEarlier ? <Loader2 className="size-3.5 animate-spin mr-1.5" /> : null}
+                  {loadingEarlier ? 'Loading...' : 'Load earlier activity'}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
