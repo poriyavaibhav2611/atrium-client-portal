@@ -16,5 +16,14 @@ export const messages = [{ client: 'Fold Studio', text: 'Amazing, shipping it to
 export const overview = { activeProjects: 12, pendingApprovals: 4, revenue: 18420 }
 export const settings = { workspace: 'Taylor & Co.', plan: 'Studio' } 
 export const timeline = [{ text: 'New comment', time: 'Today, 10:42' }, { text: 'File uploaded', time: 'Yesterday' }, { text: 'Invoice paid', time: 'Oct 18' }, { text: 'Project approved', time: 'Oct 16' }] 
-export const mock = { user, clients, projects, approvals, invoices, files, activity, messages, overview, settings, timeline }
+export const workspaceBranding = { name: "Taylor & Co.", slug: "taylorco", accentColor: "#4F46E5", logoUrl: null }
+export const paymentSettings = { connected: true, onlinePayments: true, receipts: true, terms: 'Net 15' }
+export const notificationSettings = {
+  newMessage: true,
+  approvalUpdates: true,
+  invoicePaid: true,
+  weeklySummary: false
+}
+export const securitySettings = { tfaEnabled: false, setupDate: null };
+export const mock = { user, clients, projects, approvals, invoices, files, activity, messages, overview, settings, timeline, workspaceBranding, paymentSettings, notificationSettings, securitySettings }
 export default mock

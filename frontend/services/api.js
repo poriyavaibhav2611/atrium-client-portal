@@ -21,3 +21,53 @@ export const getApprovals = () => wait(mock.approvals)
 export const getInvoices = () => wait(mock.invoices)
 export const getActivity = () => wait(mock.activity)
 export const getSettings = () => wait(mock.settings)
+// Future backend will store Workspace { name, slug, accentColor, logoUrl } and client portal will read it by slug.
+export const getWorkspace = () => wait(mock.workspaceBranding)
+export const updateWorkspace = (data) => {
+  mock.workspaceBranding = { ...mock.workspaceBranding, ...data }
+  return wait(mock.workspaceBranding)
+}
+export const checkSlug = (slug) => {
+  const taken = ['atrium', 'app', 'admin', 'www', 'api', 'taken']
+  return wait({ available: !taken.includes(slug) }, 400)
+}
+export const getPaymentSettings = () => wait(mock.paymentSettings, 400)
+export const updatePaymentSettings = (data) => {
+  mock.paymentSettings = { ...mock.paymentSettings, ...data };
+  return wait(mock.paymentSettings, 400);
+}
+export const connectStripe = () => {
+  mock.paymentSettings = { ...mock.paymentSettings, connected: true, onlinePayments: true };
+  return wait({ ok: true }, 600);
+}
+export const disconnectStripe = () => {
+  mock.paymentSettings = { ...mock.paymentSettings, connected: false, onlinePayments: false };
+  return wait({ ok: true }, 400);
+}
+export const getNotificationSettings = () => wait(mock.notificationSettings, 400)
+export const updateNotificationSettings = (data) => {
+  mock.notificationSettings = { ...mock.notificationSettings, ...data };
+  return wait(mock.notificationSettings, 400);
+}
+
+// Future backend will use TOTP (otplib), store the secret encrypted and hash the recovery codes.
+export const changePassword = (current, next) => wait({ ok: current === 'Demo@1234' ? true : false }, 600)
+export const getSecuritySettings = () => wait(mock.securitySettings, 400)
+export const enableTwoFactor = (code) => {
+  if (code === '123456') {
+    mock.securitySettings.tfaEnabled = true;
+    mock.securitySettings.setupDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return wait({ ok: true }, 400);
+  }
+  return wait({ ok: false }, 400);
+}
+export const disableTwoFactor = (password) => {
+  if (password === 'Demo@1234') {
+    mock.securitySettings.tfaEnabled = false;
+    mock.securitySettings.setupDate = null;
+    return wait({ ok: true }, 400);
+  }
+  return wait({ ok: false }, 400);
+}
+export const regenerateRecoveryCodes = () => wait({ ok: true }, 400)
+export const signOutOtherSessions = () => wait({ ok: true }, 400)

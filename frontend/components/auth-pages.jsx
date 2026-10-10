@@ -18,7 +18,7 @@ function BrandPanel() {
   return <aside className="relative hidden min-h-screen overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-600 to-indigo-700 p-12 text-white lg:flex lg:flex-col lg:justify-between"><div className="pointer-events-none absolute inset-0 opacity-15 [background-image:radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:22px_22px]" /><div className="pointer-events-none absolute -right-32 top-1/4 size-96 rounded-full bg-indigo-300/20 blur-3xl" /><div className="relative"><AtriumLogo light /><div className="mt-28 max-w-md"><Quote className="size-10 text-white/70" /><p className="mt-6 text-2xl font-medium leading-tight">Atrium made our client experience feel as intentional as the work we deliver.</p><div className="mt-7 flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-full bg-white/20 text-sm font-semibold">MC</span><p className="text-sm text-white/90">Maya Chen · Founder, Fold Studio</p></div><div className="mt-9 flex flex-col gap-3 text-sm text-white/90">{['Free 14-day trial', 'Bank-grade security', 'Cancel anytime'].map((item) => <span key={item} className="flex items-center gap-2"><Check className="size-4" />{item}</span>)}</div></div></div><div className="relative flex items-center gap-3 text-sm text-white/80"><div className="flex -space-x-2">{['AL', 'JR', 'SK'].map((initials) => <span key={initials} className="flex size-8 items-center justify-center rounded-full border-2 border-indigo-600 bg-white/20 text-[10px] font-semibold text-white">{initials}</span>)}</div>Join 2,000+ agencies</div></aside>
 }
 
-function PasswordInput({ id, value, onChange, placeholder = '••••••••', error }) {
+export function PasswordInput({ id, value, onChange, placeholder = '••••••••', error }) {
   const [visible, setVisible] = useState(false)
   return <div><div className="relative"><input id={id} value={value} onChange={onChange} type={visible ? 'text' : 'password'} placeholder={placeholder} aria-invalid={!!error} className={`h-11 w-full rounded-lg border bg-background px-3.5 pr-11 text-sm outline-none transition focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:border-white/15 ${error ? 'border-red-500' : 'border-slate-200'}`} /><button type="button" aria-label={visible ? 'Hide password' : 'Show password'} onClick={() => setVisible((current) => !current)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">{visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}</button></div>{error && <p className="mt-1 text-xs text-red-500">{error}</p>}</div>
 }
@@ -33,7 +33,7 @@ function SocialLogin() {
 
 function Field({ id, label, children, error }) { return <label htmlFor={id} className="flex flex-col gap-2 text-sm font-medium">{label}{children}{error && <span className="text-xs font-normal text-red-500">{error}</span>}</label> }
 
-function strength(password) { let score = 0; if (password.length >= 8) score++; if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++; if (/\d/.test(password)) score++; if (/[^A-Za-z0-9]/.test(password)) score++; return score }
+export function strength(password) { let score = 0; if (password.length >= 8) score++; if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++; if (/\d/.test(password)) score++; if (/[^A-Za-z0-9]/.test(password)) score++; return score }
 
 export function AuthPage({ mode }) {
   const router = useRouter()
